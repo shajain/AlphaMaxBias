@@ -81,16 +81,18 @@ g(q) = pX(q) ./ npX(q);
 if length(q) < size(X, 1)
     g(setdiff(1 : size(X, 1), q)) = mean(g(q));
 end
-
+g=postCal(g);
 auc = get_auc_ultra(g, s);
 
 x_ind=1:size(X0,1);
 x=g(x_ind)';
 x1=g(setdiff(1:size(X,1),x_ind))';
 
+
 out.opts=opts;
 out.x=x;
 out.x1=x1;
+out.pp=length(x1)/(length(x1)+length(x));
 out.auc=auc;
 end
 

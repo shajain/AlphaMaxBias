@@ -148,10 +148,10 @@ for im = 1:length(method)
             out.x=x; out.x1=x1;
             %opts.densityEst_fcn=@densEst_histDouble;
         end
-        if isfield(opts,'postTransform')
-                [x,x1]=opts.postTransform(x,x1);
-                opts.densityEst_fcn=@densEst_hist_gaussian;
-        end
+%         if isfield(opts,'postTransform')
+%                 [x,x1]=opts.postTransform(x,x1);
+%                 opts.densityEst_fcn=@densEst_hist_gaussian;
+%         end
         [est.(str),out.(str)]=fcn(x,x1,opts);
     end
 end

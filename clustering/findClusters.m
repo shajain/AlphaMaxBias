@@ -3,6 +3,7 @@ function [cluster_X0 , cluster_X1, num_clusters,out] = findClusters(X0,X1,M)
     n_s_X0 = size(X0,1);
     n_s_X1 = size(X1,1);
     
+   %Project to the high dimensional datasets to a 50 dimensional space
     d = size(X1,2);
     n_f = size(X1,2);
     X1_P = X1;
@@ -19,7 +20,7 @@ function [cluster_X0 , cluster_X1, num_clusters,out] = findClusters(X0,X1,M)
     cluster_X1 = zeros(size(X1_P,1),1);
     centroid_X1 = [];
     sc_M = zeros(M,1);
-    
+   %Cluster positives 
     num_clusters = 2;
     for n_c = 2:M
         [idx,ctrd] = kmeans(X1_P,n_c,'Replicates',10);
@@ -32,10 +33,14 @@ function [cluster_X0 , cluster_X1, num_clusters,out] = findClusters(X0,X1,M)
         end
     end
     
+    %assign clusters to unlabeled points by finding the closest point in
+    %the positive clustering.
     cluster_X0 = zeros(size(X0_P,1),1);
     for i = 1:size(X0_P,1)
         cluster_X0(i) = find_nearest_vector(X0_P(i,:),centroid_X1);
     end
+    
+    %Assign cluster sizes
     cSize=[];
     cSize1=[];
     for ix=1:num_clusters
