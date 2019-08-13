@@ -33,15 +33,22 @@ cSize=[];
 cSize1=[];
 transforms={};
 for i=1:n_clust
-    Xs=[Xs,X(C==i,1:end)];
-    X1s=[X1s,X1(C1==i,1:end)];
+    Xs=[Xs,{X(C==i,1:end)}];
+    X1s=[X1s,{X1(C1==i,1:end)}];
     cSize=[cSize,sum(C==i)]
     cSize1=[cSize1,sum(C1==i)]
-    [x,x1,tr]=opts.transform(Xs{i},X1s{i});
-    x=x(:); x1=x1(:);
-    %[x,x1]=cdfGaussTransform(x,x1);
-    xs=[xs,x]; x1s=[x1s,x1];transforms=[transforms,tr];
-    [est,outAm]=estimateMixprop(x,x1,'AlphaMax');
+    if (cSize(i)~=0)
+        [x,x1,tr]=opts.transform(Xs{i},X1s{i});
+        x=x(:); x1=x1(:);
+        %[x,x1]=cdfGaussTransform(x,x1);
+        xs=[xs,x]; x1s=[x1s,x1];transforms=[transforms,tr];
+        [est,outAm]=estimateMixprop(x,x1,'AlphaMax');
+    else
+        xs=[xs,{{}}]; x1s=[x1s,ones(cSize1(i),1)];transforms=[transforms,{{}}];
+        est=struct();
+        est.AlphaMax=0;
+        outAm=struct();
+    end
     ests=[ests,est.AlphaMax];
     ams=[ams,outAm];
 end

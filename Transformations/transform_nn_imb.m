@@ -7,6 +7,7 @@ DEF.B=100;% 100 bagged neural networks
 DEF.h=5;  % 5 hidden neurons
 DEF.l=2; %2 layers
 DEF.val_frac=0.25; % fraction of training data in the validation set
+DEF.Xe=[];
 if nargin < 3
     opts=DEF;
 else
@@ -31,6 +32,8 @@ pX = zeros(n, 1);
 
 % number of predictions for each data point
 npX = zeros(n, 1);
+pXe=zeros(size(opts.Xe,1),1);
+%npXe=zeros(size(Xe,1),1);
 
 % run training and testing
 for b = 1 : B
@@ -104,6 +107,10 @@ for b = 1 : B
     p = sim(net{b}, Xt');
     pX(q_c) = pX(q_c) + p';  % add predictions
     npX(q_c) = npX(q_c) + 1; % update counts
+    if (length(opts.Xe)>0)
+        pe = sim(net{b}, opts.Xe');
+        pXe = pXe + pe';  % add predictions
+    end
 end
 
 % this will produce values for function g, using out-of-bag data
@@ -111,6 +118,9 @@ q = find(npX ~= 0); % just in case some data points haven't been selected
 g(q) = pX(q) ./ npX(q);
 if length(q) < size(X, 1)
     g(setdiff(1 : size(X, 1), q)) = mean(g(q));
+end
+if (length(opts.Xe)>0)
+      pXe = pXe/B;  % add predictions
 end
 %g=PNpostCal_imb(g,0.5,n1/n);
 auc = get_auc_ultra(g, s);
@@ -124,6 +134,7 @@ out.x=x;
 out.x1=x1;
 out.auc=auc;
 out.pp=0.5;
+out.poste=pXe;
 
     function v = duplicate(x,size)
         v=x;

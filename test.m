@@ -3,7 +3,7 @@ clc
 
 n = 1000;     % number of negatives
 n1 = 250;     % number of positives
-alpha = 0.15; % true mixing proportion (class prior)
+alpha = 0.75; % true mixing proportion (class prior)
 
 % the number of positive and negative data points in unlabeled data
 p(2) = round(alpha * n)
@@ -29,6 +29,28 @@ for k = 1 : 2
 end
 
 X1 = repmat(m(:, 2)', n1, 1) + randn(n1, 2) * chol(S(:, :, 2));
+
+opts=struct();
+opts.h=1;
+[x,x1,out]=transform_nn(X,X1,opts);
+pp=length(x1)/(length(x1)+length(x));
+xpn=PUpost2PNpost(x,(1-pp)/pp,0.15);
+[y,y1,out]=transform_nn_imb(X,X1,opts);
+ypn=PUpost2PNpost(y,1,0.15);
+
+
+opts.Xe=X1;
+[z,z1,out]=transform_nn_imb(X(1:p(1),:),X((p(1)+1):end,:),opts);
+%pp=length(x1)/(length(x1)+length(x));
+zpn=changePrior([z;z1], 0.5, 0.15);
+figure;
+scatter(zpn,xpn)
+xlabel('posterior PN')
+ylabel('corrected PN posterior, imbalance training data')
+figure;
+scatter(zpn,ypn)
+xlabel('posterior PN')
+ylabel('corrected PN posterior, rebalanced training data')
 
 %% Get to estimation work
 %opts.postTransform=@cdfGaussTransform;
